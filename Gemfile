@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+
+ruby '2.0.0'
+gem 'houston'
+gem 'gcm'
+gem 'resque', '~> 1.24.0'
+gem 'rake'
+gem 'newrelic_rpm'
+gem 'twilio-ruby'
+gem 'mandrill-api'
