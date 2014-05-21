@@ -21,50 +21,50 @@ module GBPushNotificationsService
 
   class Push
     def self.push(message)
-      #logging
+      # logging
       puts message
 
-      #verify the query
+      # verify the query
       required_fields = ['targets', 'alert', 'payload']
       required_fields.all? { |e| message.include?(e) } or raise StandardError('Push message didn\'t contain all required fields')
 
-      #get the targets
+      # get the targets
       targets = message['targets']
 
-      #make sure we have at least 1 target
+      # make sure we have at least 1 target
       if targets.count > 0
 
-        #Apple APN
-        targets.each do |target| #send to each Apple target separately, we have an open connection so it's fine
+        # Apple APN
+        targets.each do |target|# send to each Apple target separately, we have an open connection so it's fine
           if target['type'] == 'APN'
 
-            #construct the payload
-            notification = Houston::Notification.new(:device => target['deviceIdentifier'])
-            
+            # construct the payload
+            notification = Houston::Notification.new(device: target['deviceIdentifier'])
+
             notification.alert = message['alert']
             notification.badge = message['badge'] if message['badge']
             notification.sound = message['sound'] || 'default'
-            notification.custom_data = {:p => message['payload']} if message['payload']
+            notification.custom_data = { p: message['payload'] } if message['payload']
 
-            #get the relevant connection
+            # get the relevant connection
             connection = @@apn_prod
 
-            #send it off
-            connection.open#up, try hoisting the connectin opening and closing out of this each loop, so multiple notificaitons can be sent down a single connection
+            # send it off
+            connection.open# up, try hoisting the connectin opening and closing out of this each loop, so multiple notificaitons can be sent down a single connection
             connection.write(notification.message)
             connection.close
           end
         end
 
-        #Google GCM
-        if targets.any? {|target| target['type'] == 'GCM'}
-          registration_ids = targets.select{|target| target['type'] == 'GCM'}.map{|target| target['deviceIdentifier']} #send to all targets in one go
+        # Google GCM
+        if targets.any? { |target| target['type'] == 'GCM' }
+          registration_ids = targets.select{ |target| target['type'] == 'GCM' }.map{ |target| target['deviceIdentifier'] }# send to all targets in one go
 
           options = {}
 
           options[:collapse_key] = message['topic'] unless message['topic'].nil?
 
-          if (message['payload'] || message['alert'])
+          if message['payload'] || message['alert']
             data = {}
           
             data[:p] = message['payload'] if message['payload']
@@ -73,10 +73,9 @@ module GBPushNotificationsService
 
             options[:data] = data
           end
-          
-          #send it off
-          response = @@gcm.send_notification(registration_ids, options)#response is discarded
-          puts response
+
+          # send it off
+          @@gcm.send_notification(registration_ids, options)
         end
       end
     end
