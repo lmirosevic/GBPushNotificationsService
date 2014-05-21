@@ -14,14 +14,13 @@ require './lib/email/email.rb'
 
 require 'newrelic_rpm'
 
-task 'resque:setup' do
-	uri = URI.parse(ENV['RESQUE_REDIS_URI'])
-	Resque.redis = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
-	# Resque.redis.namespace = "resque:push"
+task 'resque:setup' => :dotenv do
+  Resque.redis = Redis.connect(url: ENV['RESQUE_REDIS_URI'])
+  # Resque.redis.namespace = "resque:push"
 
-	ENV['QUEUE'] = '*'
+  ENV['QUEUES'] = 'email,push,sms'
 
-	GBPushNotificationsService::Push.connect
-	GBPushNotificationsService::SMS.connect
-	GBPushNotificationsService::Email.connect
+  GBPushNotificationsService::Push.connect
+  GBPushNotificationsService::SMS.connect
+  GBPushNotificationsService::Email.connect
 end
