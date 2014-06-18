@@ -6,6 +6,7 @@
 # Created by Luka Mirosevic on 06/11/2013.
 # Copyright (c) 2013 Goonbee. All rights reserved.
 
+require 'dotenv/tasks'
 require 'resque/tasks'
 require 'resque'
 require './lib/push/push.rb'
