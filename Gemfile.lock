@@ -63,5 +63,5 @@ DEPENDENCIES
   mandrill-api
   newrelic_rpm
   rake
-  resque (~> 1.24.0)
+  resque (~> 1.24)
   twilio-ruby
